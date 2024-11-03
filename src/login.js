@@ -6,7 +6,7 @@ import { useState } from "react";
 import { auth } from "./firebase";
 import { signInWithEmailAndPassword,sendPasswordResetEmail } from "firebase/auth";
 
-const Login_page = () => {
+const Login_page = ({setAuth}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,6 +15,7 @@ const Login_page = () => {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      setAuth(true);  
       navigate('/home');  // Redirect to home or another page after successful login
     } catch (err) {
       switch (err.code) {
@@ -30,7 +31,7 @@ const Login_page = () => {
         default:
           alert("Login failed. Please check your credentials and try again.");
           break;
-      }
+      }   
     }
   };
 
