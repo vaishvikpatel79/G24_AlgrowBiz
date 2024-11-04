@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react'
 
-const Sign_up = () => {
+const Sign_up = ({setAuth}) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -16,6 +16,7 @@ const Sign_up = () => {
     const handleSignUp = async () => {
         try {
           await createUserWithEmailAndPassword(auth, email, password);
+          setAuth(true); 
           navigate('/home');  // Redirect to login after successful signup
         } catch (err) {
           switch (err.code) {
