@@ -51,7 +51,7 @@ const Sign_up = ({setAuth}) => {
             </div>
             {error && <p className="error">{error}</p>}
             <button className='submit-btn' onClick={handleSignUp}>Sign Up</button>
-            <p>Already have an account? <Link to='/login'>Login</Link></p>
+            <p>Already have an account? <Link to='/initForm'>Login</Link></p>
           </div>
         </div>
       );
