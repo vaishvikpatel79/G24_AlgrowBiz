@@ -1,0 +1,72 @@
+body {
+    padding-top: 60px;
+}
+.profile-container {
+    /* max-width: 500px; */
+    min-width: 450px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: gainsboro;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-height: 400px; /* Ensures consistent height before and after editing */
+  }
+  
+  .profile-container h2 {
+    text-align: center;
+    color: black;
+    padding-bottom: 10px;
+
+  }
+  
+  .profile-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .profile-field label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .profile-field p {
+    margin: 0;
+    color: #666;
+  }
+  
+  .profile-field input,
+  .profile-field select {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 60%;
+    box-sizing: border-box;
+  }
+  
+  .profile-field select[multiple] {
+    height: auto; 
+  }
+  
+  .profile-actions {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .profile-actions button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    background-color: #4CAF50;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .profile-actions button:hover {
+    background-color: #45a049;
+  }
+  
