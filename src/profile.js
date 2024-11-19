@@ -16,15 +16,17 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const statesList = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"];
-  const categoryList = ['Electronics', 'Food', 'Health', 'Clothing', 'Home Appliances'];
+  const categoryList = ['Electronics', 'Clothes', 'Stationery', 'Groceries', 'Books', 'Furniture', 'Toys', 'Home Appliances', 'Footwear', 'Beauty & Personal Care'];
 
   useEffect(() => {
     fetchProfileData();
   }, []);
 
+  // fetching the profile data to show
   const fetchProfileData = async () => {
+    const uID = localStorage.getItem('userId');
     try {
-      const response = await axios.get('http://localhost:5000/profile');
+      const response = await axios.get('http://localhost:5000/profile?userId=${uID}');
       console.log(response.data);
       setProfile(response.data);
     } catch (error) {
@@ -32,21 +34,40 @@ const Profile = () => {
     }
   };
 
+  // to change the input field value as soon as we change the value in the input field
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Validate mobile number
+    if (name === 'mobileNumber') {
+      const mobileRegex = /^[6-9]\d{9}$/; // Validates Indian 10-digit numbers starting with 6-9
+      if (!mobileRegex.test(value)) {
+        alert('Invalid mobile number. It must be 10 digits and start with 6, 7, 8, or 9.');
+      }
+    }
+
     setProfile({
       ...profile,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
-
-  const handleCategoryChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    setProfile({
-      ...profile,
-      categoriesSold: selectedOptions
-    });
+  
+  const handleCheckboxChange = (e, category) => {
+    if (e.target.checked) {
+      // Add category to the list
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        categoriesSold: [...prevProfile.categoriesSold, category],
+      }));
+    } else {
+      // Remove category from the list
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        categoriesSold: prevProfile.categoriesSold.filter((c) => c !== category),
+      }));
+    }
   };
-
+  
   const handleEdit = () => {
     setIsEditing(true);
   };
@@ -101,12 +122,12 @@ const Profile = () => {
       <div className="profile-field">
         <label>Mobile Number:</label>
         {isEditing ? (
-          <input
-            type="text"
-            name="mobileNumber"
-            value={profile.mobileNumber}
-            onChange={handleChange}
-          />
+            <input
+              type="text"
+              name="mobileNumber"
+              value={profile.mobileNumber}
+              onChange={handleChange}
+            />
         ) : (
           <p>{profile.mobileNumber}</p>
         )}
@@ -153,22 +174,26 @@ const Profile = () => {
           <p>{profile.state}</p>
         )}
       </div>
-
-      <div className="profile-field">
-        <label>Categories Sold:</label>
+      
+      <div className="checkbox-container">
+        <label className="checkbox-label">Categories Sold:</label>
         {isEditing ? (
-          <select
-            name="categoriesSold"
-            multiple
-            value={profile.categoriesSold}
-            onChange={handleCategoryChange}
-          >
+          <div className="checkbox-field">
             {categoryList.map((category) => (
-              <option key={category} value={category}>{category}</option>
+              <div className="each-checkbox" key={category}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={profile.categoriesSold.includes(category)}
+                    onChange={(e) => handleCheckboxChange(e, category)}
+                  />
+                  {category}
+                </label>
+              </div>
             ))}
-          </select>
+          </div>
         ) : (
-          <p>{profile.categoriesSold.join(', ')}</p>
+          <p className="checkbox-para">{profile.categoriesSold.join(', ')}</p>
         )}
       </div>
 

@@ -16,7 +16,6 @@ body {
     text-align: center;
     color: black;
     padding-bottom: 10px;
-
   }
   
   .profile-field {
@@ -70,3 +69,33 @@ body {
     background-color: #45a049;
   }
   
+
+  .checkbox-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 10px; 
+  } 
+
+  .checkbox-label{
+    font-weight: bold;
+    color: #555;
+  }
+
+  .checkbox-field{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.2rem;
+    background-color: white;
+    border-radius: 0.3rem;
+  }
+
+  .each-checkbox{
+    display: flex;
+    padding-left: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .checkbox-para{
+    color: #666;
+  }
