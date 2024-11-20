@@ -1,78 +1,122 @@
-import React from 'react'
-import {db} from './firebase'
-import './style.css'
-import { auth } from './firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
+import './signup.css';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react'
 
 const Sign_up = ({setAuth}) => {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-    const handleSignUp = async () => {
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          setAuth(true); 
-          navigate('/home');  // Redirect to login after successful signup
-        } catch (err) {
-          switch (err.code) {
-            case 'auth/email-already-in-use':
-              alert("This email is already in use. Please try logging in or use another email.");
-              break;
-            case 'auth/invalid-email':
-              alert("Invalid email format. Please check and try again.");
-              break;
-            case 'auth/weak-password':
-              alert("Password is too weak. Use at least 6 characters.");
-              break;
-            default:
-              alert("Error signing up. Please try again later.");
-              break;
-          }
-        }
-      };
+  const handleSignUp = async () => {
+    setError(''); // Reset error message
+  
+    // Simple email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    // Input validation
+    if (!name || !email || !password || !confirmPassword) {
+      setError('All fields are required.');
+      return;
+    }
     
-    return (
-        <div className='container'>
-          <div className='form'>
-            <h2>Sign Up</h2>
-            <div className='box'>
-              <input type='text' placeholder='UserName' onChange={(e) => setName(e.target.value)} />
-            </div>
-            <div className='box'>
-              <input type='email' placeholder='Email' onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div className='box'>
-              <input type='password' placeholder='Password' onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            {error && <p className="error">{error}</p>}
-            <button className='submit-btn' onClick={handleSignUp}>Sign Up</button>
-            <p>Already have an account? <Link to='/initForm'>Login</Link></p>
-          </div>
-        </div>
-      );
-  /*return (
-    <div className='container'>
-        <div className='form'>
-            <h2>Sign Up</h2>
-            <div className='box'>
-                <input type='text' placeholder='UserName' onChange={(e)=>setName(e.target.value)}></input>
-            </div>
-            <div className='box'>
-                <input type='email' placeholder='Email' onChange={(e)=>setEmail(e.target.value)}></input>
-            </div>
-            <div className='box'>
-                <input type='password' placeholder='Password' onChange={(e)=>setPassword(e.target.value)}></input>
-            </div>
-            <p>Already have an account? <Link to='/login'>Login</Link></p>
-            <button>Sign Up</button>
-        </div>
-    </div>
-  )*/
-}
+    // to throw an error for invalid email address
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+  
+    // password and confirm password should be equal
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+  
+    try {
+      // sending the data to backend server
+      const response = await fetch(`http://localhost:5000/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: name, email, password }),
+      });
+      
+      // if there is some error in signup
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Signup failed');
+      }
+      
+      // data received from backend server
+      const data = await response.json();
+  
+      // Save userId to local storage for further use
+      if (data.userId) {
+        localStorage.setItem('userId', data.userId);
+      } else {
+        throw new Error('UserId not found in the response');
+      }
 
-export default Sign_up
+      // set setAuth to true such that user can go to other pages
+      setAuth(true);
+      // Navigate to the next page, to collect initial basic info
+      navigate('/initForm');
+    } catch (err) {
+      setError(err.message || 'Error signing up. Please try again later.');
+    }
+  };  
+
+  return (
+    <div className="signup-container">
+      <div className="signup-form">
+        <h2 className="signup-heading">Sign Up</h2>
+        <div className="input-box">
+          <input
+            type="text"
+            className="signup-input"
+            placeholder="UserName"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className="input-box">
+          <input
+            type="email"
+            className="signup-input"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="input-box">
+          <input
+            type="password"
+            className="signup-input"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div className="input-box">
+          <input
+            type="password"
+            className="signup-input"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+        {error && <p className="signup-error">{error}</p>}
+        <button className="signup-btn" onClick={handleSignUp}>
+          Sign Up
+        </button>
+        <p className="signup-link">
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Sign_up;
