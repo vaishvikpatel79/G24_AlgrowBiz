@@ -22,36 +22,28 @@ const Profile = () => {
     fetchProfileData();
   }, []);
 
-  // fetching the profile data to show
+  // Fetching the profile data to show
   const fetchProfileData = async () => {
     const uID = localStorage.getItem('userId');
     try {
-      const response = await axios.get('http://localhost:5000/profile?userId=${uID}');
-      console.log(response.data);
+      const response = await axios.get(`http://localhost:5000/profile?userId=${uID}`);
       setProfile(response.data);
     } catch (error) {
       console.error("Error fetching profile data:", error);
     }
   };
 
-  // to change the input field value as soon as we change the value in the input field
+  // To change the input field value as soon as we change the value in the input field
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Validate mobile number
-    if (name === 'mobileNumber') {
-      const mobileRegex = /^[6-9]\d{9}$/; // Validates Indian 10-digit numbers starting with 6-9
-      if (!mobileRegex.test(value)) {
-        alert('Invalid mobile number. It must be 10 digits and start with 6, 7, 8, or 9.');
-      }
-    }
 
     setProfile({
       ...profile,
       [name]: value
     });
   };
-  
+
+  // Handling checkbox changes
   const handleCheckboxChange = (e, category) => {
     if (e.target.checked) {
       // Add category to the list
@@ -67,17 +59,48 @@ const Profile = () => {
       }));
     }
   };
-  
+
+  // Toggle editing mode
   const handleEdit = () => {
     setIsEditing(true);
   };
 
+  // Validate and save the profile
   const handleSave = async () => {
+    // Validate mobile number
+    // const mobileRegex = /^[6-9]\d{9}$/; // Validates Indian 10-digit numbers starting with 6-9
+    // if (!mobileRegex.test(profile.mobileNumber)) {
+    //   alert('Invalid mobile number. It must be 10 digits and start with 6, 7, 8, or 9.');
+    //   return;
+    // }
+    if (!/^\d{10}$/.test(profile.mobileNumber)) {
+      alert('Invalid mobile number. It must be exactly 10 digits.');
+      return;
+    }
+
+    if (!/^[6-9]/.test(profile.mobileNumber)) {
+        alert('Invalid mobile number. It must start with 6, 7, 8, or 9.');
+        return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Validates basic email format
+    if (!emailRegex.test(profile.userEmail)) {
+      alert('Invalid email address. Please enter a valid email.');
+      return;
+    }
+
+    // Save profile data
     try {
-      await axios.put('http://localhost:5000/editprofile', profile);
-      setIsEditing(false);
-      fetchProfileData();
+      const response = await axios.put(`http://localhost:5000/editprofile`, profile);
+      if(response.status === 200){
+        setIsEditing(false);
+        fetchProfileData();
+      }
+      else{
+        alert('Failed to update Profile');
+      }
     } catch (error) {
+      alert('Error updating profile');
       console.error("Error updating profile:", error);
     }
   };
@@ -122,12 +145,12 @@ const Profile = () => {
       <div className="profile-field">
         <label>Mobile Number:</label>
         {isEditing ? (
-            <input
-              type="text"
-              name="mobileNumber"
-              value={profile.mobileNumber}
-              onChange={handleChange}
-            />
+          <input
+            type="text"
+            name="mobileNumber"
+            value={profile.mobileNumber}
+            onChange={handleChange}
+          />
         ) : (
           <p>{profile.mobileNumber}</p>
         )}
@@ -174,7 +197,7 @@ const Profile = () => {
           <p>{profile.state}</p>
         )}
       </div>
-      
+
       <div className="checkbox-container">
         <label className="checkbox-label">Categories Sold:</label>
         {isEditing ? (
@@ -209,4 +232,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
