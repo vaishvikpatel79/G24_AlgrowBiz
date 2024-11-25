@@ -1,96 +1,93 @@
-import React from "react";
-import { db } from "./firebase";
-import "./style.css";
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from "react";
-import { auth } from "./firebase";
-import { signInWithEmailAndPassword,sendPasswordResetEmail } from "firebase/auth";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./login.css";
 
-const Login_page = ({setAuth}) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+const LoginPage = ({ setAuth }) => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setAuth(true);  
-      navigate('/home');  // Redirect to home or another page after successful login
-    } catch (err) {
-      switch (err.code) {
-        case 'auth/user-not-found':
-          alert("No user found with this email. Please sign up.");
-          break;
-        case 'auth/wrong-password':
-          alert("Incorrect password. Please try again.");
-          break;
-        case 'auth/invalid-email':
-          alert("Invalid email format. Please check and try again.");
-          break;
-        default:
-          alert("Login failed. Please check your credentials and try again.");
-          break;
-      }   
-    }
-  };
+    const handleLogin = async () => {
+        setError(""); // Clear previous errors
+        setMessage(""); // Clear previous messages
+        try {
+            // send credentials to backend server
+            const response = await fetch(`http://localhost:5000/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      alert("Please enter your email to reset password.");
-      return;
-    }
-    try {
-      await sendPasswordResetEmail(auth, email);
-      alert("Password reset email sent! Check your inbox.");
-    } catch (err) {
-      if (err.code === 'auth/user-not-found') {
-        alert("No user found with this email. Please check or sign up.");
-      } else {
-        alert("Error resetting password. Please try again.");
-      }
-    }
-  };
+            // if there is an error in login
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Login failed");
+            }
 
-  return (
-    <div className='container'>
-      <div className='form'>
-        <h2>Login</h2>
-        <div className='box'>
-          <input type='email' placeholder='Email' onChange={(e) => setEmail(e.target.value)} />
+            // login successful...
+            const data = await response.json();
+            console.log("Login successful:", data);
+
+            setMessage("Login successful!");
+
+            // store userId so that it can be used later
+            if (data.userId) {
+                localStorage.setItem('userId', data.userId);
+            }
+            else {
+                throw new Error('UserId not found in the response');
+            }
+            setAuth(true); // Update authentication state, so that user can visit other pages
+            navigate("/home"); // Redirect to home page
+        } catch (err) {
+            setError(err.message || "Error logging in. Please try again later.");
+        }
+    };
+
+    const handleForgotPassword = async () => {
+        navigate("/forgotPassword");
+    };
+
+    return (
+        <div className="login-container">
+            <div className="login-form">
+                <h2>Login</h2>
+                <div className="input-box">
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                <div className="input-box">
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+                {/* Display error and success messages */}
+                {error && <p className="error-message">{error}</p>}
+                {message && <p className="message success-message">{message}</p>}
+                <button className="login-button" onClick={handleLogin}>
+                    Login
+                </button>
+                <button
+                    className="forgot-password-button"
+                    onClick={handleForgotPassword}
+                >
+                    Forgot Password?
+                </button>
+                <p className="signup-link">
+                    Don't have an account? <Link to="/signup">Sign Up</Link>
+                </p>
+            </div>
         </div>
-        <div className='box'>
-          <input type='password' placeholder='Password' onChange={(e) => setPassword(e.target.value)} />
-        </div>
-        {error && <p className="error">{error}</p>}
-        <button className='submit-btn' onClick={handleLogin}>Login</button>
-        <button className='forgotpswrd-btn' onClick={handleForgotPassword}>Forgot Password?</button>
-        <p>Don't have an account? <Link to='/signup'>Sign Up</Link></p>
-      </div>
-    </div>
-  );
-
-  /*return (
-    <div className="container">
-      <div className="form">
-        <h2>Login</h2>
-        <div className="box">
-          <input type="text" placeholder="UserName"></input>
-        </div>
-        <div className="box">
-          <input type="email" placeholder="Email"></input>
-        </div>
-        <div className="box">
-          <input type="password" placeholder="Password"></input>
-        </div>
-        <p>
-          Don't have an account? <Link to="/signup">Sign Up</Link>
-        </p>
-        <button>Login</button>
-      </div>
-    </div>
-  );*/
-
+    );
 };
 
-export default Login_page;
+export default LoginPage;
