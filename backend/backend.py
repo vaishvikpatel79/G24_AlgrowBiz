@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from datetime import datetime
 import random, time
+import psycopg2
 from flask_mail import Mail, Message
 # Initialize Flask app
 app = Flask(__name__)
@@ -22,7 +23,7 @@ app.config['MAIL_PASSWORD'] = 'gmwn xmep lrlt cenc'
 mail = Mail(app)
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(base_dir, 'databases/database.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://database_owner:gY3Xv4kBxVyw@ep-little-tooth-a1ohlzy4.ap-southeast-1.aws.neon.tech/database?sslmode=require'
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
