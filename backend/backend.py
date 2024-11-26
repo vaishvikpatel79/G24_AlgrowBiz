@@ -40,6 +40,30 @@ class Credentials(db.Model):
     password = db.Column('password', db.Text, nullable = False)  
     date = db.Column('date',db.String(12), nullable = False)
 
+class userHistory(db.Model):
+    __tablename__ = 'userHistory'
+
+    hId = db.Column('hId',db.Integer(),autoincrement=True,primary_key=True)
+
+    userId = db.Column('userId',db.Integer(),nullable=False)
+    date = db.Column('date',db.String(10),nullable=False)
+    budget = db.Column('budget',db.Integer(),nullable=False)
+    months = db.Column('months',db.Integer(),nullable=False)
+    state = db.Column('state',db.String(20),nullable=False)
+    profit = db.Column('profit',db.Integer(),nullable=False)
+
+    products = db.relationship('userHistoryProducts', backref='user_history', lazy=True, cascade="all, delete-orphan")
+
+
+class userHistoryProducts(db.Model):
+    __tablename__ = 'userHistoryProducts'
+
+    hId = db.Column('hId',db.Integer(),db.ForeignKey(userHistory.hId),primary_key=True)                             
+
+    subcategory = db.Column('subcategory',db.String(20),primary_key=True)
+    category = db.Column('category',db.String(20),nullable=False)
+    quantity = db.Column('quantity',db.Integer(),nullable=False)
+
 # Signup route for creating a new user
 @app.route('/signup', methods=['POST','GET'])
 def signup():
@@ -79,6 +103,7 @@ def signup():
         db.session.rollback()  # Rollback if there's an error
         app.logger.error(f"Error during signup: {str(e)}")
         return jsonify({'message': 'Internal server error'}), 500
+    
     
 # Route to handle login
 @app.route('/login', methods=['POST'])
@@ -175,6 +200,97 @@ def resetPassword():
     user.password = hashedPassword
     db.session.commit()
     return jsonify({"message": "Password has been reset successfully"}), 200
+
+@app.route('/saveInventoryOptimization/<userId>',methods=['POST'])
+def saveHistory(userId):
+    
+    payload = request.get_json()
+
+    if payload == None:
+        return jsonify({'error' : 'No data provided'}),400
+    
+    date=datetime.today().strftime('%Y-%m-%d')
+    budget = payload.get('budget')
+    months = payload.get('months')
+    state = payload.get('state')
+    products = payload.get('products')
+    optimizedInventory = payload.get('optimizedInventory')
+
+    profit = optimizedInventory.get('profit')
+    quantities = optimizedInventory.get('quantities')
+
+    
+    if(months > 12 or months < 1):
+        return jsonify({'error' : 'not a valid month'}),401
+    
+    if(len(products) != len(quantities)):
+        return jsonify({'error' : 'invalid data handeled'}),402
+    
+    dict = {}
+
+    for i in range(len(products)):
+        dict[products[i].get('subcategory')] = quantities[i],products[i].get('category')
+    
+    dict=list(dict.items())
+
+    try: 
+        with db.session.begin():
+
+            uh = userHistory(userId=userId,profit=profit,budget=budget,months=months,state=state,date=date)
+
+            db.session.add(uh)
+            db.session.flush()
+
+            hid = uh.hId
+
+            for tup in dict:
+                db.session.add(userHistoryProducts(hId=hid,quantity=tup[1][0],subcategory=tup[0],category=tup[1][1]))
+            
+            db.session.flush()
+    
+    except Exception as e:
+        db.session.rollback()
+    
+
+    except Exception as e:
+        return jsonify({'error':'not able to commit to database'}),403
+    
+    return jsonify({'message':'done!'}),200
+
+@app.route('/getInventoryOptimizations/<userId>',methods=['GET'])
+def getHistory(userId):
+    user_history_items = userHistory.query.filter_by(userId=userId).all()
+    
+
+    data = {"list":[]}
+
+    for item in user_history_items:
+
+        li = []
+
+        for p in item.products:
+            li.append(
+                {
+                    "category": p.category,
+                    "subcategory": p.subcategory,
+                    "quantity" : p.quantity
+                }
+            )
+
+        data['list'].append(
+            {
+                "date":item.date,
+                "budget": item.budget,
+                "months": item.months,
+                "state": item.state,
+                "profit": item.profit,
+                "products": li
+            }
+        )
+
+    # Return the data as a JSON response
+    return jsonify(data)
+
 
 
 if __name__ == '__main__':
