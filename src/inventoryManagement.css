@@ -1,0 +1,129 @@
+body
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: rgb(206, 233, 234); 
+}
+
+.inventory-title {
+  text-align: center;
+  margin-bottom: 15px;
+  background-color: rgb(190, 176, 156);
+  border-radius: 10px;
+  justify-self: center;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Main container styling */
+.inventory-container {
+  /* max-width: 1000px; */
+  /* min-width: 800px; */
+  width: 65vw;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-container h2,
+.inventory-container h3 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 5px;
+  background-color: #f8f9fa;
+}
+
+/* Form container styling */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Spacing between form rows */
+}
+
+.form-row {
+  display: flex;
+  gap: 10px; /* Space between fields in the same row */
+}
+
+.form-row input,
+.form-row select {
+  flex: 1; /* Make both fields in the row take equal width */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Remove spinners in number inputs */
+input[type="number"] {
+  -moz-appearance: textfield; 
+}
+
+/* Button styling */
+ .form-container button {
+  margin-top: 10px;
+  padding: 10px;
+  color: #fff;
+  background-color: #36cc59;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.form-container button:hover {
+  background-color: #218838;
+}
+
+/* Product list styling */
+.product-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-list th,
+.product-list td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.product-list th {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.product-list td button {
+  margin-right: 5px;
+  padding: 5px 10px;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.product-list td button:first-child {
+  background-color: #ffc107;
+}
+
+.product-list td button:last-child {
+  background-color: #dc3545;
+}
+
+/* Category filter dropdown */
+.category-filter {
+  display: right;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.category-filter select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
