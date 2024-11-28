@@ -40,6 +40,15 @@ class Credentials(db.Model):
     password = db.Column('password', db.Text, nullable = False)  
     date = db.Column('date',db.String(12), nullable = False)
 
+class CustomerInfo(db.Model):
+    __tablename__ = "CustomerInfo"
+    userId = db.Column('userId', db.Integer, primary_key = True)
+    companyName = db.Column('companyName', db.Text, nullable = False)
+    state = db.Column('state', db.Text, nullable = False)
+    prodCategories = db.Column('prodCategories', db.Text, nullable = False)
+    mobileNumber = db.Column('mobileNumber', db.Integer, nullable = False)
+    city = db.Column('city', db.Text, nullable = False)
+
 class userHistory(db.Model):
     __tablename__ = 'userHistory'
 
@@ -200,6 +209,35 @@ def resetPassword():
     user.password = hashedPassword
     db.session.commit()
     return jsonify({"message": "Password has been reset successfully"}), 200
+
+@app.route('/initForm', methods=['POST', 'GET'])
+def initForm():
+    try:
+        userId = request.args.get('userId')
+        # Get the JSON data from the request
+        data = request.json
+        companyName = data.get('companyName')
+        state = data.get('state')
+        prodCategories = data.get('prodCategories')  # Assuming this is a list or dictionary
+        
+        prodCategories = ", ".join(prodCategories)    
+        
+        # Create a new CustomerInfo entry
+        newCustomer = CustomerInfo(
+            userId = userId,
+            companyName = companyName,
+            state = state,
+            prodCategories = prodCategories
+        )
+
+        # Add the entry to the database
+        db.session.add(newCustomer)
+        db.session.commit()
+        return jsonify({'message': 'Customer information added successfully!'}), 200
+
+    except Exception as e:
+        app.logger.error(f"Error adding customer: {str(e)}")
+        return jsonify({'message': 'Failed to add customer information.'}), 500
 
 @app.route('/saveInventoryOptimization/<userId>',methods=['POST'])
 def saveHistory(userId):
