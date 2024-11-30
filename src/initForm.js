@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./initForm.css";
+import config from "./config.js";
 
 export default function InitForm() {
   const [custInfo, setCustInfo] = useState({
@@ -14,6 +15,8 @@ export default function InitForm() {
   const [prodCategories, setProdCategories] = useState([]);
   const [error, setError] = useState({});
   const navigate = useNavigate();
+
+  const backendUrl = config.backendUrl;
 
   const states = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -90,7 +93,7 @@ export default function InitForm() {
       try {
         const userId = localStorage.getItem("userId");
         const response = await axios.post(
-          `https://algrowbiz-backend-2.onrender.com/initForm?userId=${userId}`,
+          `${backendUrl}/initForm?userId=${userId}`,
           data,
           { headers: { "Content-Type": "application/json" } }
         );

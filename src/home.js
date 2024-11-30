@@ -1,17 +1,20 @@
 import React, { useEffect } from "react";
-// import "./style.css";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState} from "react";
 import axios from 'axios'; 
 import "./home.css";
+import config from "./config.js";
+
 const Home_page = () => {
     const userId = localStorage.getItem('userId');
     const [userName, setUserName] = useState('');
+
+    const backendUrl = config.backendUrl;
     
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/home/${userId}`);
+                const response = await axios.get(`${backendUrl}/home/${userId}`);
                 if(response.data){
                     setUserName(response.data);
                 }
@@ -38,12 +41,12 @@ const Home_page = () => {
                     <h3>Forecast</h3>
                     <p>View sales forecasts and plan ahead.</p>
                 </Link>
-                <Link to="/inventory" className="card">
+                <Link to="/inventoryManagement" className="card">
                     <h3>Inventory</h3>
                     <p>Manage your product inventory with ease.</p>
                 </Link>
-                <Link to="/inventoryOptimisation" className="card">
-                    <h3>Inventory Optimisation</h3>
+                <Link to="/inventoryOptimization" className="card">
+                    <h3>Inventory Optimization</h3>
                     <p>Optimise your inventory with ease.</p>
                 </Link>
                 <Link to="/trends" className="card">

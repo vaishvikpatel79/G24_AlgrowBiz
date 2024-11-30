@@ -11,6 +11,7 @@ import {
 } from "chart.js"; // for renderig charts
 import axios from "axios"; // to handle API requests
 import "./trends.css"; // CSS file for styling the page
+import config from './config.js';
 
 // Registering necessary chart components with Chart.js
 ChartJS.register(
@@ -28,6 +29,8 @@ export default function Trends() {
   const [categoryData, setCategoryData] = useState([]);         // State to store fetched trends data
   const [loading, setLoading] = useState(false);                // State to track loading status
   const [error, setError] = useState(null);                     // State to store error message if API call fails
+
+  const backendUrl = config.backendUrl;
 
   // List of states to be displayed in the state dropdown
   const states = [
@@ -94,13 +97,14 @@ export default function Trends() {
     setLoading(true); // Set loading state to true
     try {
       // Make API request to fetch trend data
-      const response = await axios.post(
-        `https://algrowbiz-backend-2.onrender.com/trends`,
-        {
-          state: selectedState, // Passing data to backend
-          category: selectedCategory,
-        }
-      );
+        const response = await axios.post(
+            `${backendUrl}/trends`,
+            {
+            state: selectedState, // Passing data to backend
+            category: selectedCategory,
+            }
+        );
+
       // If response is successful, update categoryData state with fetched data
       if (response.status === 200) {
         setCategoryData(response.data);

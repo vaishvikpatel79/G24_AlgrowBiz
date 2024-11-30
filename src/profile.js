@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './profile.css';
+import config from './config.js';
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -18,6 +19,8 @@ const Profile = () => {
   const statesList = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"];
   const categoryList = ['Electronics', 'Clothes', 'Stationery', 'Groceries', 'Books', 'Furniture', 'Toys', 'Home Appliances', 'Footwear', 'Beauty & Personal Care'];
 
+  const backendUrl = config.backendUrl;
+
   useEffect(() => {
     fetchProfileData();
   }, []);
@@ -26,7 +29,7 @@ const Profile = () => {
   const fetchProfileData = async () => {
     const uID = localStorage.getItem('userId');
     try {
-      const response = await axios.get(`http://localhost:5000/profile?userId=${uID}`);
+      const response = await axios.get(`${backendUrl}/profile?userId=${uID}`);
       setProfile(response.data);
     } catch (error) {
       console.error("Error fetching profile data:", error);
@@ -68,19 +71,10 @@ const Profile = () => {
   // Validate and save the profile
   const handleSave = async () => {
     // Validate mobile number
-    // const mobileRegex = /^[6-9]\d{9}$/; // Validates Indian 10-digit numbers starting with 6-9
-    // if (!mobileRegex.test(profile.mobileNumber)) {
-    //   alert('Invalid mobile number. It must be 10 digits and start with 6, 7, 8, or 9.');
-    //   return;
-    // }
-    if (!/^\d{10}$/.test(profile.mobileNumber)) {
-      alert('Invalid mobile number. It must be exactly 10 digits.');
+    const mobileRegex = /^[6-9]\d{9}$/; // Validates Indian 10-digit numbers starting with 6-9
+    if (!mobileRegex.test(profile.mobileNumber)) {
+      alert('Invalid mobile number. It must be 10 digits and start with 6, 7, 8, or 9.');
       return;
-    }
-
-    if (!/^[6-9]/.test(profile.mobileNumber)) {
-        alert('Invalid mobile number. It must start with 6, 7, 8, or 9.');
-        return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Validates basic email format
@@ -91,7 +85,7 @@ const Profile = () => {
 
     // Save profile data
     try {
-      const response = await axios.put(`http://localhost:5000/editprofile`, profile);
+      const response = await axios.put(`${backendUrl}/editprofile`, profile);
       if(response.status === 200){
         setIsEditing(false);
         fetchProfileData();

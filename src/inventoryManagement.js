@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './inventoryManagement.css';
 import axios from 'axios';
+import config from './config.js';
 
 const InventoryManagement = () => {
   const [products, setProducts] = useState([]); // List of all items in inventory
@@ -19,6 +20,8 @@ const InventoryManagement = () => {
   const categories = ['Electronics', 'Clothes', 'Stationery', 'Groceries', 'Books', 'Furniture', 'Toys', 'Home Appliances', 'Footwear', 'Beauty & Personal Care'];
   const [selectedCategory, setSelectedCategory] = useState(''); // To filter products by category
   
+  const backendUrl = config.backendUrl;
+
   const item_categories = {
     'Electronics': 1, 'Clothes': 2, 'Stationery': 3, 'Groceries': 4, 'Books': 5,
     'Furniture': 6, 'Toys': 7, 'Home Appliances': 8, 'Footwear': 9, 'Beauty & Personal Care': 10
@@ -53,7 +56,7 @@ const InventoryManagement = () => {
   const fetchProductsByCategory = async (selectedCategory) => {
     try {
       console.log(selectedCategory);
-      const response = await axios.get(`http://localhost:5000/products?category=${selectedCategory}&userId=${userId}`);
+      const response = await axios.get(`${backendUrl}/products?category=${selectedCategory}&userId=${userId}`);
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products by category:", error);
@@ -121,11 +124,11 @@ const InventoryManagement = () => {
       if (isEditing) {
         // Update product in backend
         // await axios.put(`http://127.0.0.1:5000/inventory/modify?itemId=${newProduct.itemId}`, newProduct);    //// optional
-        await axios.put('http://127.0.0.1:5000/inventory/modify?userId=${userId}', newProduct);
+        await axios.put(`${backendUrl}/inventory/modify?userId=${userId}`, newProduct);
         setIsEditing(false);
       } else {
         //adding a new product
-        await axios.post('http://127.0.0.1:5000/inventory/insert?userId=${userId}', newProduct);
+        await axios.post(`{backendUrl}/inventory/insert?userId=${userId}`, newProduct);
       }
       setNewProduct({ itemId: '', category: '', name: '', quantity: '', costPrice: '', sellingPrice: '' });
       fetchProductsByCategory(selectedCategory);
@@ -136,7 +139,7 @@ const InventoryManagement = () => {
 
   const deleteProduct = async (itemId) => {
     try {
-      await axios.delete(`http://127.0.0.1:5000/inventory/delete?itemId=${itemId}&userId=${userId}`);
+      await axios.delete(`${backendUrl}/inventory/delete?itemId=${itemId}&userId=${userId}`);
       fetchProductsByCategory(selectedCategory);
     } catch (error) {
       console.error("Error deleting product:", error);

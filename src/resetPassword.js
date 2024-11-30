@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./resetPassword.css";
+import { useNavigate } from "react-router-dom";
+import config from './config.js';
 
 function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
@@ -9,6 +11,9 @@ function ResetPassword() {
 
   const location = useLocation(); // To get the email from navigation state
   const email = location.state?.email; // Extract email from state
+  const navigate = useNavigate();
+
+  const backendUrl = config.backendUrl;
 
   const handleResetPassword = async () => {
     if (!newPassword || !confirmPassword) {
@@ -21,7 +26,7 @@ function ResetPassword() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/resetPassword", {
+      const response = await fetch(`${backendUrl}/resetPassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, newPassword }),
@@ -30,6 +35,7 @@ function ResetPassword() {
       const data = await response.json();
       if (response.ok) {
         setMessage(data.message || "Password reset successfully.");
+        navigate('/login');
       } else {
         throw new Error(data.message || "Error resetting password. Please try again.");
       }
@@ -67,7 +73,15 @@ function ResetPassword() {
           Reset Password
         </button>
 
-        {message && <div className="reset-message">{message}</div>}
+        {message && (
+          <div
+            className={`reset-message ${
+              message === 'Password reset successfully.' ? 'reset-message-green' : 'reset-message-red'
+            }`}
+          >
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );

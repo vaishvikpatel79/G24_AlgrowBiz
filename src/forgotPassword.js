@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "./forgotPassword.css";
+import config from "./config.js";
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
@@ -9,13 +10,15 @@ function ForgotPassword() {
     const [verificationCode, setVerificationCode] = useState("");
     const navigate = useNavigate();
 
+    const backendUrl = config.backendUrl;
+
     const handleForgotPassword = async () => {
         if (!email) {
             alert("Please enter your email to reset password.");
             return;
         }
         try {
-            const response = await fetch("http://localhost:5000/forgotPassword", {
+            const response = await fetch(`${backendUrl}/forgotPassword`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),
@@ -40,7 +43,7 @@ function ForgotPassword() {
         }
 
         try {
-            const response = await fetch("http://localhost:5000/verifyCode", {
+            const response = await fetch(`https://algrowbiz-backend-2.onrender.com/verifyCode`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, verificationCode }),
@@ -76,7 +79,17 @@ function ForgotPassword() {
 
                 <button className="action-btn" onClick={handleForgotPassword}>Send Code</button>
 
-                {message && <div className="message">{message}</div>}
+                {/* {message && <div className="message">{message}</div>} */}
+
+                {message && (
+                    <div
+                        className={`forgot-message ${
+                        message === 'Password reset email sent' ? 'forgot-message-green' : 'forgot-message-red'
+                        }`}
+                    >
+                        {message}
+                    </div>
+                )}
 
                 {showCodeInput && (
                     <div className="code-input-container">
