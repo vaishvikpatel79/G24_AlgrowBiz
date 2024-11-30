@@ -29,7 +29,7 @@ const Profile = () => {
   const fetchProfileData = async () => {
     const uID = localStorage.getItem('userId');
     try {
-      const response = await axios.get(`${backendUrl}/profile?userId=${uID}`);
+      const response = await axios.get(`${backendUrl}/profile/${uID}`);
       setProfile(response.data);
     } catch (error) {
       console.error("Error fetching profile data:", error);
