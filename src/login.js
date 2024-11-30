@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
+import config from './config.js';
 
 const LoginPage = ({ setAuth }) => {
     const [email, setEmail] = useState("");
@@ -9,12 +10,14 @@ const LoginPage = ({ setAuth }) => {
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
+    const backendUrl = config.backendUrl;
+
     const handleLogin = async () => {
         setError(""); // Clear previous errors
         setMessage(""); // Clear previous messages
         try {
             // send credentials to backend server
-            const response = await fetch(`http://localhost:5000/login`, {
+            const response = await fetch(`${backendUrl}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

@@ -1,0 +1,123 @@
+/* Container for the Forecast Component */
+.forecast-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f3f4f6;
+  }
+  
+  /* Optimized Text */
+  .forecast-text {
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    background: linear-gradient(135deg, #e55728, #0b3a0d);
+    background-clip: text;
+    color: transparent;
+    -webkit-background-clip: text;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, color 0.3s ease;
+    margin-top: 1rem;
+  }
+  
+  .forecast-text:hover {
+    transform: scale(1.03);
+    text-shadow: 0px 0px 20px rgba(255, 255, 255, 0.7), 0px 0px 25px rgba(199, 247, 26, 0.6);
+  }
+  
+  @media (max-width: 768px) {
+    .optimized-text {
+        font-size: 0.9em;
+        letter-spacing: 0px;
+    }
+  }
+  
+  .forecast-form {
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 100%;
+    margin: 1rem 1rem;
+  }
+  
+  /* Form Elements */
+  .forecast-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #374151;
+  }
+  
+  .forecast-select,
+  .forecast-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #4b5563;
+    outline: none;
+  }
+  
+  .forecast-select:focus,
+  .forecast-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
+  
+  /* Button */
+  .forecast-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #3b82f6;
+    border: none;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .forecast-button:hover {
+    background-color: #2563eb;
+  }
+  
+  /* Forecast Result */
+  .forecast-result h3 {
+    /* margin-top: 1.5rem; */
+    font-size: 1.25rem;
+    color: #10b981;
+    text-align: center;
+  }
+  
+  .forecast-result {
+    margin-top: 1rem;
+    background-color: #f0fdf4;
+    padding: 0.5rem;
+    border: 1px solid #d1fae5;
+    border-radius: 6px;
+  }
+
+  /* Error Message */
+.forecast-error {
+  margin-top: 1rem;
+  color: #ef4444; /* Red color for error */
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  background-color: #fef2f2; /* Light red background */
+  border: 1px solid #fca5a5; /* Red border */
+  padding: 0.75rem;
+  border-radius: 6px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
+}  

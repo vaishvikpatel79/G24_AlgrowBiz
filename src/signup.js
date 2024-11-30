@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './signup.css';
 import { Link, useNavigate } from 'react-router-dom';
+import config from './config.js';
 
 const Sign_up = ({setAuth}) => {
   const [name, setName] = useState('');
@@ -10,8 +11,12 @@ const Sign_up = ({setAuth}) => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const backendUrl = config.backendUrl;
+
   const handleSignUp = async () => {
     setError(''); // Reset error message
+
+    console.log("Pressed Signup Button");
   
     // Simple email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,7 +41,7 @@ const Sign_up = ({setAuth}) => {
   
     try {
       // sending the data to backend server
-      const response = await fetch(`http://localhost:5000/signup`, {
+      const response = await fetch(`${backendUrl}/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userName: name, email, password }),

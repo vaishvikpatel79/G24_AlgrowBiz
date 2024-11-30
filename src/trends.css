@@ -1,0 +1,122 @@
+/* Container for the entire trends page */
+.trends-container {
+    margin-top: 80px;
+    padding: 60px;
+    text-align: center;
+  }
+  
+  /* Header section containing the quote, title, and filters */
+  .trends-header {
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    padding: 1.1rem 1.1rem 0.1rem 1.1rem;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  /* Quote styling */
+  .trends-quote {
+    width: 100%;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    background: linear-gradient(135deg, #e55728, #0b3a0d);
+    background-clip: text;
+    color: transparent;
+    -webkit-background-clip: text;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  
+  .trends-quote:hover {
+    transform: scale(1.03);
+  }
+  
+  /* Title styling */
+  .trends-title {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Filters section styling */
+  .trends-filters {
+    margin-bottom: 20px;
+  }
+  
+  .trends-select {
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .trends-button {
+    padding: 10px 20px;
+    background-color: #ff8c42;
+    color: #fff;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .trends-button:hover {
+    background-color: #ff6e1a;
+  }
+  
+  /* Error message styling */
+  .trends-error {
+    color: red;
+    font-size: 16px;
+    margin-top: 1rem;
+  }
+  
+  /* Light background for charts container */
+  .charts-container {
+    background-color: #f9fafb;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  /* Wrapper for both charts */
+  .charts-wrapper {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  /* Individual chart styling */
+  .trends-chart {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    max-width: 45%;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .trends-chart p {
+    margin-top: 3rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333333;
+    text-align: center;
+    background: linear-gradient(90deg, #ff8c42, #ff6e1a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+  }
