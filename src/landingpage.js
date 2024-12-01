@@ -1,18 +1,34 @@
-import React from "react";
-import { db } from "./firebase";
-import "./style.css";
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from "react";
-import { auth } from "./firebase";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './landingPage.css';
 
-const Landing_page = () => {
-    return (
-        <div className='container'>
-            <div className='form'>
-                <h2>Welcome to Landing Page</h2>
-            </div>
+export default function LandingPage() {
+  return (
+    <div className="landing-page">
+      <div className="background-overlay"></div>
+
+      {/* Project Logo */}
+      <div className="content-container">
+        <div className="logo-container">
+          <img src='/algrowbiz-logo.jpg' alt="AlgrowBiz Logo" className="logo" />
         </div>
-    );
-};
 
-export default Landing_page;
+        <div className="description">
+          <h1>Welcome to <span>AlgrowBiz</span></h1>
+          <p>
+            AlgrowBiz empowers you with smart retail sales forecasting and seamless inventory management.
+            Make informed decisions, uncover product trends, and drive success with data-driven insights.
+          </p>
+        </div>
+
+        {/* <div className='landingQuote'>Success in business is driven by data, and AlgrowBiz turns that data into growth.</div> */}
+
+        <div className="">
+          <Link to="/login" className="btn-primary">
+            Get Started
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
