@@ -8,6 +8,7 @@ from datetime import datetime
 import random, time
 import psycopg2
 from flask_mail import Mail, Message
+from Sales_pred_func import sales_prediction
 # Initialize Flask app
 app = Flask(__name__)
 
@@ -45,9 +46,37 @@ class CustomerInfo(db.Model):
     userId = db.Column('userId', db.Integer, primary_key = True)
     companyName = db.Column('companyName', db.Text, nullable = False)
     state = db.Column('state', db.Text, nullable = False)
-    prodCategories = db.Column('prodCategories', db.Text, nullable = False)
-    mobileNumber = db.Column('mobileNumber', db.Integer, nullable = False)
+    mobileNumber = db.Column('mobileNumber', db.String(15), nullable = False)
     city = db.Column('city', db.Text, nullable = False)
+    
+    # Relationship to UserCategories
+    categories = db.relationship("UserCategories", back_populates="customer", cascade="all, delete", lazy=True)
+
+class UserCategories(db.Model):
+    __tablename__ = "UserCategories"
+    userId = db.Column('userId', db.Integer, db.ForeignKey("CustomerInfo.userId"), primary_key = True)
+    categoryName = db.Column('categoryName', db.Text, primary_key = True)
+    
+    # Relationship to CustomerInfo
+    customer = db.relationship("CustomerInfo", back_populates="categories")
+
+class Trends(db.Model):
+    __tablename__ = "Trends"
+    categoryId = db.Column('categoryId', db.Integer, primary_key = True, autoincrement = True)
+    categoryName = db.Column('categoryName', db.Text, nullable = False)
+    state = db.Column('state', db.Text, nullable = False)
+    itemName = db.Column('itemName', db.Text, nullable = False)
+    sales = db.Column('sales', db.Integer, nullable = False)
+
+class Inventory(db.Model):
+    __tablename__ = "Inventory"
+    userId = db.Column('userId', db.Integer, primary_key = True)
+    itemId = db.Column('itemId', db.Text, primary_key = True)
+    itemName = db.Column('itemName', db.Text, nullable = False)
+    quantity = db.Column('quantity', db.Integer, nullable = False)
+    categoryName = db.Column('categoryName', db.Text, nullable = False)
+    costPrice = db.Column('costPrice', db.Integer, nullable = False)
+    sellingPrice = db.Column('sellingPrice', db.Integer, nullable = False)
 
 class userHistory(db.Model):
     __tablename__ = 'userHistory'
@@ -238,6 +267,160 @@ def initForm():
     except Exception as e:
         app.logger.error(f"Error adding customer: {str(e)}")
         return jsonify({'message': 'Failed to add customer information.'}), 500
+
+def get_top_5_sales(cat_name, state):
+    # Query to filter by categoryName and state, then order by sales in descending order
+    top_5 = Trends.query.filter_by(categoryName=cat_name, state=state).order_by(Trends.sales.desc()).limit(5).all()
+    
+    # Return the top 5 results as a list of dictionaries
+    result = []
+    for item in top_5:
+        result.append({
+            'categoryName': item.categoryName,
+            'itemName': item.itemName,
+            'state': item.state,
+            'sales': item.sales
+        })
+    return result
+
+@app.route('/Trends', methods = ['POST', 'GET'])
+def Trends():
+    try:
+        data = request.json
+        state = data.get('state')
+        categoryName = data.get('category')
+        top_5_sales = get_top_5_sales(categoryName, state)
+
+        return jsonify(top_5_sales), 200
+
+    except Exception as e:
+        app.logger.error(f"Error finding trend: {str(e)}")
+        return jsonify({'message': 'Failed to find the top trending item.'}), 500
+
+@app.route('/inventory/insert', methods = ['POST', 'GET'])
+def inventoryInsert():
+    try:
+        userId = request.args.get('userId')
+        data = request.json
+        itemId = data.get('itemId')
+        itemName = data.get('name')
+        categoryName = data.get('category')
+        quantity = data.get('quantity')
+        costPrice = data.get('costPrice')
+        sellingPrice = data.get('sellingPrice')
+        product = Inventory.query.filter_by(userId = userId, itemId = itemId ).first()
+        if product:
+            return jsonify({'message' : 'Already product exist with this itemId'}), 400
+        newEntry = Inventory(userId = userId, itemId = itemId, itemName = itemName, quantity = quantity, categoryName = categoryName, costPrice = costPrice, sellingPrice = sellingPrice)
+        db.session.add(newEntry)
+        db.session.commit()
+
+        return jsonify({'message' : 'Succefully entry added'}), 200
+
+    except Exception as e:
+        app.logger.error(f"Entry Didn't got inserted: {str(e)}")
+        return jsonify({"message': 'Entry didn't got inserted."}), 500
+
+@app.route('/products', methods=['GET', 'POST'])
+def getProductsByCategory():
+    category = request.args.get('category')
+    userId = request.args.get('userId')
+    
+    user = CustomerInfo.query.get(userId)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Extract the list of categories the user sells
+    # user_categories = [cat.categoryName for cat in user.categories]
+
+    # Ensure the requested category is valid for this user
+    # if category not in user_categories:
+        # return jsonify({"error": "User does not sell the specified category"}), 400
+    
+    if category:
+        products = Inventory.query.filter_by(userId = userId, categoryName = category).all()
+
+        products_data = [
+        {
+            'itemId': product.itemId,
+            'category': product.categoryName,
+            'name': product.itemName,
+            'quantity': product.quantity,
+            'costPrice': product.costPrice,
+            'sellingPrice': product.sellingPrice
+        }
+            for product in products
+        ]
+        return jsonify(products_data), 200
+    else:
+        return jsonify({"error": "Category not specified"}), 400
+
+@app.route('/inventory/delete', methods = ['POST', 'GET', 'DELETE'])
+def inventoryDelete():
+    try:
+        itemId = request.args.get('itemId') 
+        userId = request.args.get('userId')
+        if not itemId:
+            return jsonify({"error": "itemId is required"}), 400
+        entry = Inventory.query.filter_by(userId = userId, itemId = itemId).first()
+        if entry:
+            db.session.delete(entry)
+            db.session.commit()
+            return jsonify({'message' : "entry deleted successfully"}), 200
+        else:
+            return jsonify({'message' : "No entry found"}), 500
+    
+    except Exception as e:
+        app.logger.error(f"Entry didn't got deleted: {str(e)}")
+        return jsonify({"message': 'Entry didn't got deleted."}), 500
+
+
+@app.route('/inventory/modify', methods = ['POST', 'GET', 'PUT'])
+def inventoryModify():
+    try:
+        userId = request.args.get('userId')
+        data = request.json
+        itemId = data.get('itemId')
+        categoryName = data.get('category')
+        itemName = data.get('name')
+        quantity = data.get('quantity')
+        costPrice = data.get('costPrice')
+        sellingPrice = data.get('sellingPrice')
+
+        entry = Inventory.query.filter_by(userId = userId, itemId = itemId).first()
+        if entry:
+            entry.itemName = itemName
+            entry.categoryName = categoryName
+            entry.quantity = quantity
+            entry.costPrice = costPrice
+            entry.sellingPrice = sellingPrice
+            db.session.commit()
+            return jsonify({'message' : "backend is ok"}), 200     
+        else:
+            print(f"No entry found.")
+    
+    except Exception as e:
+        app.logger.error(f"Entry Didn't got modified: {str(e)}")
+        return jsonify({"message': 'Entry didn't got modified."}), 500
+
+@app.route('/forecast', methods=['POST', 'GET'])
+def forecast():
+    try:    
+        data = request.json
+        state = data.get('state')
+        categoryName = data.get('itemCategory')
+        itemName = data.get('subCategory')
+        months = data.get('months')
+        prevSale = data.get('prevSale')
+
+        # Call the ML model prediction function
+        predictedSale = sales_prediction(str(state), str(categoryName), str(itemName), int(months), int(prevSale))
+
+        return jsonify({"predictedSale" : predictedSale}), 200
+    
+    except Exception as e:
+        app.logger.error(f"Error in forecasting: {str(e)}")
+        return jsonify({'message': 'Failed to forecast'}), 500
 
 @app.route('/saveInventoryOptimization/<userId>',methods=['POST'])
 def saveHistory(userId):
