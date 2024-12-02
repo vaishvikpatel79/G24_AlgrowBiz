@@ -27,12 +27,29 @@ const Profile = () => {
 
   // Fetching the profile data to show
   const fetchProfileData = async () => {
-    const uID = localStorage.getItem('userId');
     try {
+      const uID = localStorage.getItem('userId');
+      if (!uID) {
+        console.error("No userId found in localStorage.");
+        return;
+      }
+
       const response = await axios.get(`${backendUrl}/profile?userId=${uID}`);
-      setProfile(response.data);
+      if (!response.data) {
+        throw new Error("No data received from the server.");
+      }
+      const data = response.data;
+
+      // Ensure `categoriesSold` is always an array
+      data.categoriesSold = Array.isArray(data.categoriesSold)
+        ? data.categoriesSold
+        : (data.categoriesSold ? data.categoriesSold.split(',') : []);
+
+      setProfile(data);
+      // setProfile(response.data);
+      console.log("Profile data fetched successfully:", data);
     } catch (error) {
-      console.error("Error fetching profile data:", error);
+      console.error("Error fetching profile data:", error.response || error.message);
     }
   };
 
@@ -85,18 +102,13 @@ const Profile = () => {
 
     // Save profile data
     try {
-      const response = await axios.put(`${backendUrl}/editprofile`, profile);
-      if(response.status === 200){
+        await axios.put(`${backendUrl}/editprofile`, profile);
+        // const data = response.data;
         setIsEditing(false);
         fetchProfileData();
+      } catch (error) {
+        console.error("Error updating profile:", error);
       }
-      else{
-        alert('Failed to update Profile');
-      }
-    } catch (error) {
-      alert('Error updating profile');
-      console.error("Error updating profile:", error);
-    }
   };
 
   return (
