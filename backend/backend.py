@@ -7,8 +7,11 @@ import re
 from datetime import datetime
 import random, time
 import psycopg2
+from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
 from Sales_pred_func import sales_prediction
+from Using_Inventory_Maximization import maxProfit
+import logging
 # Initialize Flask app
 app = Flask(__name__)
 
@@ -31,6 +34,16 @@ db = SQLAlchemy(app)
 
 # Temporary in-memory store for email-verification code mapping
 verification_data = {}
+
+# Generate a secret key for session management
+secret_key = os.urandom(24)
+app.secret_key = secret_key
+
+# Initialize the serializer for token generation and verification
+serializer = URLSafeTimedSerializer(app.secret_key)
+
+# Log configuration for better debugging
+logging.basicConfig(level=logging.DEBUG)
 
 # Define databases
 class Credentials(db.Model):
@@ -403,6 +416,57 @@ def inventoryModify():
         app.logger.error(f"Entry Didn't got modified: {str(e)}")
         return jsonify({"message': 'Entry didn't got modified."}), 500
 
+@app.route('/profile', methods = ['POST', 'GET'])
+def profile():
+    try:
+        userId = request.args.get('userId')
+        entry1 = CustomerInfo.query.get(userId)
+        entry2 = Credentials.query.get(userId)
+        # categoryList = entry1.prodCategories.split(", ")
+        st = ""
+        for s in entry1.categories:
+            d = s.categoryName
+            st += str(d)+", "
+        
+        st = st[0:-2]
+
+        data = {'userId' : userId, 'userName' : entry2.userName, 'userEmail' : entry2.email, 'mobileNumber' : entry1.mobileNumber, 'companyName' : entry1.companyName, 'city' : entry1.city , 'state' : entry1.state , 'categoriesSold' : st }
+      
+        if entry1 and entry2:
+            return jsonify(data), 200
+        else:
+            return jsonify({"message': 'No entry found."}), 500
+    
+    except Exception as e:
+        app.logger.error(f"Cann't fetch user data : {str(e)}")
+        return jsonify({"message': 'Cann't fetch user data."}), 500
+
+@app.route('/editprofile', methods=['PUT'])
+def editProfile():
+    data = request.json
+    userId = data.get('userId')
+    entry1 = CustomerInfo.query.filter_by(userId = userId).first()
+    entry2 = Credentials.query.filter_by(userId = userId).first()
+
+    entry2.userName = data.get('userName')
+    entry2.email = data.get('userEmail')
+    entry1.mobileNumber = data.get('mobileNumber')
+    entry1.companyName = data.get('companyName')
+    entry1.city = data.get('city')
+    entry1.state = data.get('state')
+    prodCategories = data.get('categoriesSold')  # Get the categories sold list from the request data
+    
+    db.session.query(UserCategories).filter_by(userId = userId).delete()  # Clear existing categories
+    for i in range(len(prodCategories)):
+        userCategory = UserCategories(userId = userId, categoryName = prodCategories[i])
+        db.session.add(userCategory)
+    try:
+        db.session.commit()
+        return jsonify({"message": "Profile updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to update profile"}), 500
+
 @app.route('/forecast', methods=['POST', 'GET'])
 def forecast():
     try:    
@@ -421,6 +485,32 @@ def forecast():
     except Exception as e:
         app.logger.error(f"Error in forecasting: {str(e)}")
         return jsonify({'message': 'Failed to forecast'}), 500
+
+@app.route('/inventoryOptimization', methods = ['POST', 'GET'])
+def inventoryOptimization():
+    try:    
+        data = request.json
+        budget = data.get('budget')
+        months = data.get('months')
+        state = data.get('state')
+        products = data.get('products')
+        
+        max_profit, chosen_products = maxProfit(int(budget), len(products), str(state), int(months), products)
+        length = len(chosen_products)
+        quantity = []    
+
+        if(length == 0):
+            for i in range(len(products)):
+                quantity[i] = 0
+            return jsonify({"profit" : max_profit, "quantity" : quantity}), 200
+        
+        for (item_index, qty) in chosen_products:
+            quantity.append(qty)        
+        return jsonify({"profit" : max_profit, "quantity" : quantity}), 200
+    
+    except Exception as e:
+        app.logger.error(f"Error in inventoryoptimization : {str(e)}")
+        return jsonify({'message': 'Error in inventoryoptimization.'}), 500
 
 @app.route('/saveInventoryOptimization/<userId>',methods=['POST'])
 def saveHistory(userId):
