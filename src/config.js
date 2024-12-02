@@ -1,5 +1,5 @@
 const config = {
-    backendUrl: `http://localhost:5000`,
+    backendUrl: `https://backend-ghs3.onrender.com`,
   };
   
   export default config;

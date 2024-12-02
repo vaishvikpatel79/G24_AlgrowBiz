@@ -43,7 +43,7 @@ function ForgotPassword() {
         }
 
         try {
-            const response = await fetch(`https://algrowbiz-backend-2.onrender.com/verifyCode`, {
+            const response = await fetch(`${backendUrl}/verifyCode`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, verificationCode }),
