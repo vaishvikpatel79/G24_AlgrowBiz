@@ -41,11 +41,11 @@ const Home_page = () => {
                     <h3>Forecast</h3>
                     <p>View sales forecasts and plan ahead.</p>
                 </Link>
-                <Link to="/inventoryManagement" className="card">
+                <Link to="/inventory" className="card">
                     <h3>Inventory</h3>
                     <p>Manage your product inventory with ease.</p>
                 </Link>
-                <Link to="/inventoryOptimization" className="card">
+                <Link to="/inventoryOptimisation" className="card">
                     <h3>Inventory Optimization</h3>
                     <p>Optimise your inventory with ease.</p>
                 </Link>
