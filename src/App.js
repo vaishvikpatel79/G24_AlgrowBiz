@@ -5,7 +5,7 @@
   import Login_page from './login'
   import InitForm from './initForm'
   import Home_page from './home'
-  import Landing_page from './landingPage'
+  import Landing_page from './landingpage'
   import ProtectedRoute from './ProtectedRoute'
   import InventoryManagement from './inventoryManagement';
   import InventoryOptimisation from './inventoryOptimisation';

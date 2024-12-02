@@ -1,0 +1,159 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  body, html {
+    width: 100%;
+    height: 100%;
+    background-image: url('../public/bgImage.png'); /* Make sure bgImage.png is in the public folder */
+    background-size: cover;
+  /* background-position: center; */
+  }
+  
+  .landing-page {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #007bff, #00c6ff);
+    overflow: hidden;
+  }
+  
+  /* Background Overlay */
+  .background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../public/bgImage.png');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.9;
+    z-index: 1;
+  }
+  
+  /* Content Container */
+  .content-container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Logo Styles */
+  .logo-container {
+    margin-bottom: 20px;
+  }
+  
+  .logo {
+    width: 20rem;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  /* Description Styles */
+  .description h1 {
+    font-size: 2.8em;
+    margin-bottom: 10px;
+    color: #00c6ff;
+  }
+  
+  .description h1 span {
+    color: #ffffff;
+  }
+  
+  .description p {
+    font-size: 1.2em;
+    color: #dddddd;
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  /* Button Styles */
+  .btn-primary {
+    display: inline-block;
+    padding: 12px 30px;
+    margin-top: 20px;
+    background-color: #ff8c42;
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(255, 140, 66, 0.5);
+  }
+  
+  .btn-primary:hover {
+    background-color: #ff6a00;
+    box-shadow: 0px 6px 15px rgba(255, 140, 66, 0.7);
+  }
+
+  /* Landing Quote Styles */
+.landingQuote {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #fff;
+  margin-top: 30px;
+  padding: 15px;
+  background-color: rgba(255, 140, 66, 0.8); /* Slightly transparent orange */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.landingQuote:hover {
+  transform: translateY(-5px); /* Small hover effect */
+  box-shadow: 0 6px 20px rgba(255, 140, 66, 0.5);
+}
+
+/* Add a glowing text effect */
+.landingQuote::before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #ff8c42, #ff6a00);
+  border-radius: 10px;
+  z-index: -1;
+  opacity: 0.4;
+  filter: blur(10px);
+}
+
+.landingQuote {
+  position: relative;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark background for better contrast */
+  color: #ff8c42; /* Orange color for the text */
+  font-size: 1.4em;
+  font-weight: bold;
+  border-radius: 10px;
+  margin-top: 20px;
+  max-width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.landingQuote:hover {
+  color: #fff;
+  /* background-color: #ff6a00; */
+  box-shadow: 0 6px 20px rgba(255, 140, 66, 0.5);
+}
