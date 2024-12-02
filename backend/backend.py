@@ -438,7 +438,7 @@ def saveHistory(userId):
     optimizedInventory = payload.get('optimizedInventory')
 
     profit = optimizedInventory.get('profit')
-    quantities = optimizedInventory.get('quantities')
+    quantities = optimizedInventory.get('quantity')
 
     
     if(months > 12 or months < 1):
